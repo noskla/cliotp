@@ -1,0 +1,11 @@
+
+This software (cliotp) depends on:
+
+- "libcotp" made by paolostivanin (https://github.com/paolostivanin/libcotp)
+that is licensed under the Apache License 2.0:
+https://github.com/paolostivanin/libcotp/blob/master/LICENSE
+
+and
+
+- "jsoncpp": https://github.com/open-source-parsers/jsoncpp
+
