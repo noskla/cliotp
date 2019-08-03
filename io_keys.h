@@ -1,29 +1,21 @@
 #include<fstream>
 #include<json/json.h>
 #include<json/writer.h>
-#include<unistd.h>
 #include<filesystem>
+#include"working_directory.h"
 
 bool file_exists(const std::string& file_path)
 {
 	return std::filesystem::exists(file_path);
 }
 
-void create_json()
+
+bool create_json()
 {
+
+std::string home_path = get_working_directory();
 
 #ifdef __linux__
-
-char* user = getlogin();
-std::string home_path = "/home/" + std::string(user) + "/";
-
-print_debug("Working in " + home_path);
-if (!file_exists(home_path + ".cliotp/"))
-{
-	print_debug(home_path + ".cliotp/ does not exist. Creating...");
-	std::filesystem::create_directory(home_path + ".cliotp/");
-	
-}
 
 print_debug("Working in " + home_path + ".cliotp/");
 if (!file_exists(home_path + ".cliotp/secret.json"))
@@ -39,10 +31,42 @@ if (!file_exists(home_path + ".cliotp/secret.json"))
 	//vec.append(Json::Value(3));
 	
 	secret_json << vec << std::endl;
+	
+	return true;
+
+}
+else
+{
+	print_debug(home_path + ".cliotp/secret.json exists. Skipping...");
+	return false;
+}
+
+#elif _WIN32
+
+// to be done
+
+#endif
 
 }
 
-#endif
+
+bool add_entry_to_json(std::string secret_key)
+{
+
+	#ifdef __linux__
+	std::string home_path = get_working_directory();
+	create_json();
+
+	Json::Value secret_json;
+	
+	std::fstream secret_json_file ((home_path + ".cliotp/secret.json"), std::fstream::binary);
+	secret_json_file >> secret_json;
+	 
+	secret_json.append(secret_key);
+	secret_json_file << secret_json;
+
+	return true;
+	#endif
 
 }
 
