@@ -106,12 +106,12 @@ int main (int argc, char** argv)
 	
 	else if ((arg == "-l") || (arg == "--list"))
 	{
-	
+		pretty_print_all_entries();
 	}
 	
 	else if ((arg == "-d") || (arg == "--delete"))
 	{
-		
+		std::cout << "This function is not done yet." << std::endl;
 	}
 	
 	else if ((arg == "-h") || (arg == "--help"))
