@@ -55,24 +55,53 @@ int main (int argc, char** argv)
 				if (argc > 5) { timer = argv[5]; }
 			}
 			
+			print_debug(
+				entry_name + " - found arguments:" +
+				"\n   secret => " + secret_key + 
+				"\n   digits => " + digits +
+				"\n   timer  => " + timer
+			);
+		
+			bool result = add_entry_to_json (entry_name, secret_key, digits, timer);
+			std::cout << ( result ? "Added!" : "An error occurred." ) << std::endl;
+			
 		}
-		
-		print_debug(
-			entry_name + " - found arguments:" +
-			"\n   secret => " + secret_key + 
-			"\n   digits => " + digits +
-			"\n   timer  => " + timer
-		);
-		
-		bool result = add_entry_to_json (entry_name, secret_key, digits, timer);
+		else
+		{
+			std::cout << "Not enough arguments. Please check \"cliotp --help\"." << std::endl;
+			return -1;
+		}
 		
 	}
 	
 	else if ((arg == "-g") || (arg == "--generate"))
 	{
-		//const char* secret = "";
-		//char* totp = generate_code(secret);
-		//std::cout << totp << std::endl;
+		
+		if (argc < 2)
+		{
+			std::cout << "Not enough arguments. Please check \"cliotp --help\"." << std::endl;
+			return -1;
+		}
+		
+		std::string entry_name = argv[2];
+		std::map entry_data    = get_entry_from_json(entry_name);
+		
+		if (entry_data["error"] == "yes")
+		{
+			std::cout << "This entry does not exist." << std::endl;
+			return -1;		
+		}
+		
+		const char* secret_key = entry_data["secret_key"].c_str();
+		std::string totp = std::string(generate_code(secret_key));
+
+		totp.insert(3, " ");
+		
+		std::cout << get_color("cyan") << entry_name <<  get_color("reset")
+		          << " => " << get_color("ok") << totp << get_color("reset")
+		          << std::endl << "This code will be invalidated in less than "
+		          << entry_data["timer"] << " seconds" << std::endl;
+		
 	}
 	
 	else if ((arg == "-l") || (arg == "--list"))

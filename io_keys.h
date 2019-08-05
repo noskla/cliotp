@@ -18,6 +18,7 @@ std::string home_path = get_working_directory();
 #ifdef __linux__
 
 print_debug("Working in " + home_path + ".cliotp/");
+
 if (!file_exists(home_path + ".cliotp/secret.json"))
 {
 
@@ -27,9 +28,6 @@ if (!file_exists(home_path + ".cliotp/secret.json"))
 	
 	Json::Value root;
 	root = Json::objectValue;
-	//vec.append(Json::Value(1));
-	//vec.append(Json::Value(2));  <- instead of integers put any value
-	//vec.append(Json::Value(3));
 	
 	secret_json << root;
 	
@@ -55,29 +53,50 @@ bool add_entry_to_json
 (std::string entry_name, std::string secret_key, std::string digits, std::string timer)
 {
 
-	#ifdef __linux__
 	std::string home_path = get_working_directory();
-	print_debug(home_path);
 
-	Json::Value entries;
-	print_debug("Initialized variables entries.");
-	
+	#ifdef __linux__	
 	std::ifstream _input_entries_json ((home_path + ".cliotp/secret.json"), std::ifstream::binary);
-	print_debug("Opened file.");
+	#endif
+	
+	Json::Value entries;
 	_input_entries_json >> entries;
-	print_debug("Moved contents to variable.");
 
-	print_debug("Contents: " + secret_key + " " + digits + " " + timer);
 	entries[entry_name]["secret_key"] = secret_key;
 	entries[entry_name]["digits"] = digits;
 	entries[entry_name]["timer"] = timer;
 	
 	print_debug("Saving...");
+	
+	#ifdef __linux__
 	std::ofstream _output_entries_json ((home_path + ".cliotp/secret.json"), std::ofstream::binary);
 	_output_entries_json << entries << std::endl;
+	#endif
 
 	return true;
+
+}
+
+std::map<std::string, std::string> get_entry_from_json (std::string entry_name)
+{
+	
+	std::string home_path = get_working_directory();
+
+	#ifdef __linux__
+	std::ifstream _input_entries_json ((home_path + ".cliotp/secret.json"), std::ifstream::binary);
 	#endif
+	
+	Json::Value entries;
+	_input_entries_json >> entries;
+	
+	std::map<std::string, std::string> output_data;
+	output_data["secret_key"] = entries[entry_name]["secret_key"].asString();	
+	output_data["digits"]     = entries[entry_name]["digits"].asString();
+	output_data["timer"]      = entries[entry_name]["timer"].asString();
+	
+	output_data["error"] = ((output_data["secret_key"] == "") ? "yes" : "no");
+	
+	return output_data;
 
 }
 
