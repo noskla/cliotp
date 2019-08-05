@@ -37,14 +37,34 @@ int main (int argc, char** argv)
 	if ((arg == "-a") || (arg == "--add"))
 	{
 		
+		// declare variables in this scope
+		std::string entry_name;
+		std::string secret_key;
+		std::string digits = "6";
+		std::string timer = "30";
+		
 		if (argc >= 3)
-			std::string secret_key = argv[3];
-		else
 		{
-			std::cout << "Please specify the secret key\n>> ";
-			std::string secret_key;
-			std::cin >> secret_key;	
+			// Get values
+			entry_name = argv[2];
+			secret_key = argv[3];
+			
+			if (argc > 4)
+			{
+				digits = argv[4];
+				if (argc > 5) { timer = argv[5]; }
+			}
+			
 		}
+		
+		print_debug(
+			entry_name + " - found arguments:" +
+			"\n   secret => " + secret_key + 
+			"\n   digits => " + digits +
+			"\n   timer  => " + timer
+		);
+		
+		bool result = add_entry_to_json (entry_name, secret_key, digits, timer);
 		
 	}
 	
