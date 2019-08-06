@@ -48,19 +48,29 @@ else
 
 }
 
-
-bool add_entry_to_json
-(std::string entry_name, std::string secret_key, std::string digits, std::string timer)
+Json::Value get_all_entries ()
 {
 
 	std::string home_path = get_working_directory();
 
-	#ifdef __linux__	
+	#ifdef __linux__
 	std::ifstream _input_entries_json ((home_path + ".cliotp/secret.json"), std::ifstream::binary);
 	#endif
 	
 	Json::Value entries;
 	_input_entries_json >> entries;
+	
+	return entries;
+
+}
+
+
+bool add_entry_to_json
+(std::string entry_name, std::string secret_key, std::string digits, std::string timer)
+{
+
+	Json::Value entries = get_all_entries();
+	std::string home_path = get_working_directory();
 
 	entries[entry_name]["secret_key"] = secret_key;
 	entries[entry_name]["digits"] = digits;
@@ -80,14 +90,7 @@ bool add_entry_to_json
 std::map<std::string, std::string> get_entry_from_json (std::string entry_name)
 {
 	
-	std::string home_path = get_working_directory();
-
-	#ifdef __linux__
-	std::ifstream _input_entries_json ((home_path + ".cliotp/secret.json"), std::ifstream::binary);
-	#endif
-	
-	Json::Value entries;
-	_input_entries_json >> entries;
+	Json::Value entries = get_all_entries();
 	
 	std::map<std::string, std::string> output_data;
 	output_data["secret_key"] = entries[entry_name]["secret_key"].asString();	
@@ -100,38 +103,20 @@ std::map<std::string, std::string> get_entry_from_json (std::string entry_name)
 
 }
 
-void pretty_print_all_entries ()
+void remove_entry (std::string entry_name)
 {
 
+	Json::Value entries = get_all_entries();
 	std::string home_path = get_working_directory();
-
-	#ifdef __linux__
-	std::ifstream _input_entries_json ((home_path + ".cliotp/secret.json"), std::ifstream::binary);
-	#endif
 	
-	Json::Value entries;
-	_input_entries_json >> entries;
-	
-	std::map<std::string, std::map<std::string, std::string>> output_data;
-	
-	// loop through entries
-	int i = 1;
-	for ( Json::Value::const_iterator entry = entries.begin();
-		   entry != entries.end(); entry++ )
+	if (!entries[entry_name].isNull())
 	{
-
-		if (i != 1)
-			std::cout << " --- --- --- --- --- --- ---" << std::endl;
-
-		std::string key = entry.key().asString();
-
-		std::cout << get_color("ok") << key << get_color("reset") << ":" << std::endl;
-		std::cout << "Secret Key => " << entries[key]["secret_key"] << std::endl;
-		std::cout << "Digits     => " << entries[key]["digits"] << std::endl;
-		std::cout << "Timer      => " << entries[key]["timer"] << std::endl;
+		entries[entry_name].clear();
 	
-		i++;
-		
+		#ifdef __linux__
+		std::ofstream _output_entries_json ((home_path + ".cliotp/secret.json"), std::ofstream::binary);
+		_output_entries_json << entries << std::endl;
+		#endif
 	}
-
+	
 }

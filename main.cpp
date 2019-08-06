@@ -106,12 +106,39 @@ int main (int argc, char** argv)
 	
 	else if ((arg == "-l") || (arg == "--list"))
 	{
-		pretty_print_all_entries();
+		Json::Value entries = get_all_entries();
+		// loop through entries
+		int i = 1;
+		for ( Json::Value::const_iterator entry = entries.begin();
+			   entry != entries.end(); entry++ )
+		{
+
+			if (i != 1)
+				std::cout << " --- --- --- --- --- --- ---" << std::endl;
+
+			std::string key = entry.key().asString();
+
+			std::cout << get_color("ok") << key << get_color("reset") << ":" << std::endl;
+			std::cout << "Secret Key => " << entries[key]["secret_key"] << std::endl;
+			std::cout << "Digits     => " << entries[key]["digits"] << std::endl;
+			std::cout << "Timer      => " << entries[key]["timer"] << std::endl;
+	
+			i++;
+		
+		}
 	}
 	
-	else if ((arg == "-d") || (arg == "--delete"))
+	else if ((arg == "-r") || (arg == "--remove"))
 	{
-		std::cout << "This function is not done yet." << std::endl;
+		if (argc < 3)
+		{
+			std::cout << "Not enough arguments. Please check \"cliotp --help\"." << std::endl;
+			return -1;
+		}
+		
+		std::string entry_name = argv[2];
+		remove_entry(entry_name);
+		std::cout << get_color("ok") << "Ok." << get_color("reset") << std::endl;
 	}
 	
 	else if ((arg == "-h") || (arg == "--help"))
@@ -127,8 +154,8 @@ int main (int argc, char** argv)
 		std::cout << "   -l/--list" << std::endl;
 		std::cout << "    ^ List all entries." << std::endl << std::endl;
 		
-		std::cout << "   -d/--delete <name>" << std::endl;
-		std::cout << "    ^ Remove permanently specified entry." << std::endl << std::endl;
+		std::cout << "   -r/--remove <name>" << std::endl;
+		std::cout << "    ^ Remove specified entry permanently." << std::endl << std::endl;
 		
 		std::cout << "   -h/--help" << std::endl;
 		std::cout << "    ^ Display this message." << std::endl << std::endl;
