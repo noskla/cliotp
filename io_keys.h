@@ -4,6 +4,14 @@
 #include<filesystem>
 #include"working_directory.h"
 
+
+#ifdef __linux__
+std::string cliotp_dir = ".cliotp/";
+#elif _WIN32
+std::string cliotp_dir = "cliotp/";
+#endif
+
+
 bool file_exists(const std::string& file_path)
 {
 	return std::filesystem::exists(file_path);
@@ -15,16 +23,14 @@ bool create_json()
 
 std::string home_path = get_working_directory();
 
-#ifdef __linux__
-
 print_debug("Working in " + home_path + ".cliotp/");
 
-if (!file_exists(home_path + ".cliotp/secret.json"))
+if (!file_exists(home_path + cliotp_dir + "secret.json"))
 {
 
-	print_debug(home_path + ".cliotp/secret.json does not exist. Creating...");
+	print_debug(home_path + cliotp_dir + "secret.json does not exist. Creating...");
 	
-	std::ofstream secret_json((home_path + ".cliotp/secret.json"), std::ofstream::binary);	
+	std::ofstream secret_json((home_path + cliotp_dir + "secret.json"), std::ofstream::binary);	
 	
 	Json::Value root;
 	root = Json::objectValue;
@@ -36,15 +42,9 @@ if (!file_exists(home_path + ".cliotp/secret.json"))
 }
 else
 {
-	print_debug(home_path + ".cliotp/secret.json exists. Skipping...");
+	print_debug(home_path + cliotp_dir + "/secret.json exists. Skipping...");
 	return false;
 }
-
-#elif _WIN32
-
-// to be done
-
-#endif
 
 }
 
@@ -54,7 +54,7 @@ Json::Value get_all_entries ()
 	std::string home_path = get_working_directory();
 
 	#ifdef __linux__
-	std::ifstream _input_entries_json ((home_path + ".cliotp/secret.json"), std::ifstream::binary);
+	std::ifstream _input_entries_json ((home_path + cliotp_dir + "secret.json"), std::ifstream::binary);
 	#endif
 	
 	Json::Value entries;
@@ -79,7 +79,7 @@ bool add_entry_to_json
 	print_debug("Saving...");
 	
 	#ifdef __linux__
-	std::ofstream _output_entries_json ((home_path + ".cliotp/secret.json"), std::ofstream::binary);
+	std::ofstream _output_entries_json ((home_path + cliotp_dir + "secret.json"), std::ofstream::binary);
 	_output_entries_json << entries << std::endl;
 	#endif
 
@@ -113,10 +113,8 @@ void remove_entry (std::string entry_name)
 	{
 		entries[entry_name].clear();
 	
-		#ifdef __linux__
-		std::ofstream _output_entries_json ((home_path + ".cliotp/secret.json"), std::ofstream::binary);
+		std::ofstream _output_entries_json ((home_path + cliotp_dir + "secret.json"), std::ofstream::binary);
 		_output_entries_json << entries << std::endl;
-		#endif
 	}
 	
 }

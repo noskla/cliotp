@@ -63,7 +63,11 @@ int main (int argc, char** argv)
 			);
 		
 			bool result = add_entry_to_json (entry_name, secret_key, digits, timer);
-			std::cout << ( result ? "Added!" : "An error occurred." ) << std::endl;
+			
+			if (result)
+				std::cout << (get_color("ok") + "Ok!" + get_color("reset")) << std::endl;
+			else
+				std::cout << (get_color("error") + "An error occurred." + get_color("reset")) << std::endl;				
 			
 		}
 		else

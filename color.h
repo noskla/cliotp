@@ -21,7 +21,7 @@ std::string get_color (std::string color)
 	available_colors["ok"]      = "\033[1m\033[32m";
 	available_colors["error"]   = "\033[1m\033[31m";
 
-	// check if 	chosen color is in available_colors
+	// check if chosen color is in available_colors
 	if (available_colors.count(color) == 0)
 	{
 		// return empty string to not cause further problems.
